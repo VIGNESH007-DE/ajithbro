@@ -24,28 +24,39 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .animate-gradient {
-            background-size: 200% 200%;
-            animation: gradient 15s ease infinite;
+        /* Enhanced Moving Animations */
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -50px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+            100% { transform: translate(0, 0) scale(1); }
         }
 
-        @keyframes gradient {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        .animate-blob {
+            animation: float 20s infinite alternate ease-in-out;
         }
+
+        .animation-delay-2000 { animation-delay: 2s; }
+        .animation-delay-4000 { animation-delay: 4s; }
 
         .hidden-view { display: none !important; }
         
-        #recaptcha-container { margin-bottom: 10px; }
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover, 
+        input:-webkit-autofill:focus {
+            -webkit-text-fill-color: white;
+            -webkit-box-shadow: 0 0 0px 1000px rgba(15, 23, 42, 0.5) inset;
+            transition: background-color 5000s ease-in-out 0s;
+        }
     </style>
 </head>
 <body class="min-h-screen">
 
-    <!-- Background Elements -->
+    <!-- Moving Background Elements -->
     <div class="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
-        <div class="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-indigo-600/20 blur-[120px] rounded-full"></div>
-        <div class="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-purple-600/20 blur-[120px] rounded-full"></div>
+        <div class="absolute top-[-10%] right-[-10%] w-[600px] h-[600px] bg-indigo-600/20 blur-[120px] rounded-full animate-blob"></div>
+        <div class="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-purple-600/20 blur-[120px] rounded-full animate-blob animation-delay-2000"></div>
+        <div class="absolute top-[20%] left-[20%] w-[400px] h-[400px] bg-blue-600/10 blur-[100px] rounded-full animate-blob animation-delay-4000"></div>
         <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[radial-gradient(circle_at_center,rgba(99,102,241,0.05)_0%,transparent_70%)]"></div>
     </div>
 
@@ -83,50 +94,36 @@
 
             <!-- Right: Auth Card -->
             <div class="glass rounded-[2.5rem] p-8 md:p-12 shadow-2xl relative group overflow-hidden">
-                <div id="recaptcha-container"></div>
                 
                 <!-- Status/Error Box -->
                 <div id="msg-box" class="hidden-view mb-6 p-4 rounded-xl flex items-center gap-3 text-sm border"></div>
 
-                <div id="phone-entry-section">
-                    <div class="mb-10">
+                <div id="email-auth-section">
+                    <div class="mb-8">
                         <h3 id="auth-title" class="text-3xl font-bold mb-2">Welcome Back</h3>
-                        <p id="auth-subtitle" class="text-slate-400">Please enter your phone number to continue.</p>
+                        <p id="auth-subtitle" class="text-slate-400">Enter your credentials to access your account.</p>
                     </div>
 
-                    <form id="phone-form" class="space-y-4">
+                    <form id="auth-form" class="space-y-4">
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-500">
-                                <i data-lucide="phone" class="w-5 h-5"></i>
+                                <i data-lucide="mail" class="w-5 h-5"></i>
                             </div>
-                            <input type="tel" id="phone-input" placeholder="+1 234 567 8900" 
+                            <input type="email" id="email-input" placeholder="name@company.com" required
                                 class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all outline-none">
                         </div>
-                        <button type="submit" id="btn-send-otp" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-4 rounded-2xl transition-all flex items-center justify-center gap-2 group">
-                            <span>Send Code</span>
-                            <i data-lucide="arrow-right" class="w-5 h-5 group-hover:translate-x-1 transition-transform"></i>
-                        </button>
-                    </form>
-                </div>
-
-                <div id="otp-verify-section" class="hidden-view">
-                    <div class="mb-10">
-                        <h3 class="text-3xl font-bold mb-2">Verify OTP</h3>
-                        <p class="text-slate-400">We sent a 6-digit code to your phone.</p>
-                    </div>
-                    <form id="otp-form" class="space-y-4">
+                        
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-500">
-                                <i data-lucide="shield-check" class="w-5 h-5"></i>
+                                <i data-lucide="lock" class="w-5 h-5"></i>
                             </div>
-                            <input type="text" id="otp-input" placeholder="000000" maxlength="6"
-                                class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all outline-none text-center tracking-[0.5em] text-xl font-bold">
+                            <input type="password" id="password-input" placeholder="••••••••" required
+                                class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all outline-none">
                         </div>
-                        <button type="submit" id="btn-verify-otp" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-4 rounded-2xl transition-all">
-                            Verify & Continue
-                        </button>
-                        <button type="button" onclick="resetAuthFlow()" class="w-full text-slate-400 text-sm hover:text-white transition-colors">
-                            Change Phone Number
+
+                        <button type="submit" id="btn-auth-submit" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-4 rounded-2xl transition-all flex items-center justify-center gap-2 group">
+                            <span id="btn-text">Sign In</span>
+                            <i data-lucide="arrow-right" class="w-5 h-5 group-hover:translate-x-1 transition-transform"></i>
                         </button>
                     </form>
                 </div>
@@ -149,7 +146,7 @@
 
                 <div class="mt-8 text-center">
                     <p class="text-slate-500 text-sm">
-                        New to Learnixa? <button onclick="toggleAuthMode()" id="toggle-mode-btn" class="text-indigo-400 font-bold hover:text-indigo-300 transition-colors">Create an account</button>
+                        <span id="toggle-text">New to Learnixa?</span> <button onclick="toggleAuthMode()" id="toggle-mode-btn" class="text-indigo-400 font-bold hover:text-indigo-300 transition-colors">Create an account</button>
                     </p>
                 </div>
             </div>
@@ -213,8 +210,8 @@
             signInWithPopup, 
             GoogleAuthProvider, 
             GithubAuthProvider, 
-            RecaptchaVerifier, 
-            signInWithPhoneNumber, 
+            signInWithEmailAndPassword,
+            createUserWithEmailAndPassword,
             onAuthStateChanged, 
             signOut 
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -239,17 +236,15 @@
         const db = getFirestore(app);
         const appId = "learnixa-cd8d1";
 
-        let confirmationResult = null;
         let isLoginMode = true;
 
         lucide.createIcons();
 
         const authView = document.getElementById('auth-view');
         const dashboardView = document.getElementById('dashboard-view');
-        const phoneEntrySection = document.getElementById('phone-entry-section');
-        const otpVerifySection = document.getElementById('otp-verify-section');
         const msgBox = document.getElementById('msg-box');
         const userNameSpan = document.getElementById('user-name');
+        const authForm = document.getElementById('auth-form');
 
         function showMessage(text, type = 'error') {
             msgBox.textContent = text;
@@ -270,7 +265,7 @@
             if (user) {
                 authView.classList.add('hidden-view');
                 dashboardView.classList.remove('hidden-view');
-                userNameSpan.textContent = user.displayName || user.phoneNumber || 'Student';
+                userNameSpan.textContent = user.displayName || user.email.split('@')[0] || 'Student';
                 saveUserToDB(user);
             } else {
                 authView.classList.remove('hidden-view');
@@ -283,29 +278,63 @@
                 const userRef = doc(db, 'artifacts', appId, 'public', 'data', 'users', user.uid);
                 await setDoc(userRef, {
                     uid: user.uid,
-                    displayName: user.displayName || 'Learner',
+                    displayName: user.displayName || user.email.split('@')[0],
                     email: user.email || '',
                     lastLogin: new Date().toISOString(),
-                    authProvider: user.providerData[0]?.providerId || 'phone'
+                    authProvider: user.providerData[0]?.providerId || 'password'
                 }, { merge: true });
             } catch (e) {
                 console.error("DB error:", e);
             }
         }
 
-        // --- Social Logins (CORRECTED ERROR HANDLING) ---
+        // --- Email & Password Logic ---
+        authForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            clearMessage();
+            
+            const email = document.getElementById('email-input').value;
+            const password = document.getElementById('password-input').value;
+
+            try {
+                if (isLoginMode) {
+                    await signInWithEmailAndPassword(auth, email, password);
+                } else {
+                    await createUserWithEmailAndPassword(auth, email, password);
+                    showMessage("Account created successfully!", "success");
+                }
+            } catch (err) {
+                handleAuthError(err);
+            }
+        });
+
+        function handleAuthError(err) {
+            switch (err.code) {
+                case 'auth/invalid-credential':
+                    showMessage("Invalid email or password.");
+                    break;
+                case 'auth/email-already-in-use':
+                    showMessage("This email is already registered. Try logging in.");
+                    break;
+                case 'auth/weak-password':
+                    showMessage("Password should be at least 6 characters.");
+                    break;
+                case 'auth/popup-closed-by-user':
+                    showMessage("Sign-in was cancelled. Please keep the window open.");
+                    break;
+                default:
+                    showMessage(err.message);
+            }
+        }
+
+        // --- Social Logins ---
         document.getElementById('google-btn').addEventListener('click', async () => {
             clearMessage();
             const provider = new GoogleAuthProvider();
             try {
                 await signInWithPopup(auth, provider);
             } catch (err) {
-                // Handling the specific 'popup-closed-by-user' error
-                if (err.code === 'auth/popup-closed-by-user') {
-                    showMessage("Sign-in was cancelled. Please keep the window open to finish logging in.");
-                } else {
-                    showMessage(err.message);
-                }
+                handleAuthError(err);
             }
         });
 
@@ -315,67 +344,19 @@
             try {
                 await signInWithPopup(auth, provider);
             } catch (err) {
-                // Handling the specific 'popup-closed-by-user' error
-                if (err.code === 'auth/popup-closed-by-user') {
-                    showMessage("Sign-in was cancelled. Please keep the window open to finish logging in.");
-                } else {
-                    showMessage(err.message);
-                }
+                handleAuthError(err);
             }
         });
 
-        function initRecaptcha() {
-            if (!window.recaptchaVerifier) {
-                window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-                    'size': 'invisible'
-                });
-            }
-        }
-
-        document.getElementById('phone-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            clearMessage();
-            const phone = document.getElementById('phone-input').value;
-            if (!phone) return showMessage("Please enter a phone number.");
-
-            initRecaptcha();
-            const appVerifier = window.recaptchaVerifier;
-
-            try {
-                confirmationResult = await signInWithPhoneNumber(auth, phone, appVerifier);
-                phoneEntrySection.classList.add('hidden-view');
-                otpVerifySection.classList.remove('hidden-view');
-                showMessage("Code sent successfully!", "success");
-            } catch (err) {
-                showMessage(err.message);
-                if (window.recaptchaVerifier) window.recaptchaVerifier.clear();
-            }
-        });
-
-        document.getElementById('otp-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            clearMessage();
-            const otp = document.getElementById('otp-input').value;
-            if (!otp) return showMessage("Enter the 6-digit code.");
-
-            try {
-                await confirmationResult.confirm(otp);
-            } catch (err) {
-                showMessage("Invalid code. Please try again.");
-            }
-        });
-
-        window.resetAuthFlow = () => {
-            otpVerifySection.classList.add('hidden-view');
-            phoneEntrySection.classList.remove('hidden-view');
-            clearMessage();
-        };
-
+        // --- UI Toggles ---
         window.toggleAuthMode = () => {
             clearMessage();
             isLoginMode = !isLoginMode;
+            
             document.getElementById('auth-title').textContent = isLoginMode ? 'Welcome Back' : 'Create Account';
-            document.getElementById('auth-subtitle').textContent = isLoginMode ? 'Please enter your phone number to continue.' : 'Join Learnixa and start learning today.';
+            document.getElementById('auth-subtitle').textContent = isLoginMode ? 'Enter your credentials to access your account.' : 'Join Learnixa and start learning today.';
+            document.getElementById('btn-text').textContent = isLoginMode ? 'Sign In' : 'Sign Up';
+            document.getElementById('toggle-text').textContent = isLoginMode ? 'New to Learnixa?' : 'Already have an account?';
             document.getElementById('toggle-mode-btn').textContent = isLoginMode ? 'Create an account' : 'Log in here';
         };
 
