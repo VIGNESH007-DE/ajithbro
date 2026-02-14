@@ -133,7 +133,7 @@
 
                 <div class="relative py-8">
                     <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-white/10"></div></div>
-                    <div class="relative flex justify-center text-xs uppercase"><span class="bg-[#0f172a] px-4 text-slate-500">Or continue with</span></div>
+                    <div class="relative flex justify-center text-xs uppercase"><span class="bg-[#020617] px-4 text-slate-500">Or continue with</span></div>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
@@ -156,7 +156,7 @@
         </div>
     </div>
 
-    <!-- DASHBOARD VIEW (Shown after login) -->
+    <!-- DASHBOARD VIEW -->
     <div id="dashboard-view" class="hidden-view min-h-screen">
         <nav class="p-6 flex justify-between items-center max-w-7xl mx-auto">
             <div class="flex items-center gap-2">
@@ -170,7 +170,6 @@
 
         <main class="max-w-5xl mx-auto mt-16 px-6 pb-20">
             <div class="glass rounded-[3rem] p-10 md:p-16 text-center relative overflow-hidden">
-                <!-- Abstract decoration -->
                 <div class="absolute -top-20 -right-20 w-64 h-64 bg-indigo-500/10 blur-[100px] rounded-full"></div>
                 
                 <div class="inline-flex items-center justify-center p-5 bg-green-500/10 rounded-full mb-8 text-green-400 border border-green-500/20">
@@ -225,7 +224,6 @@
             setDoc 
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Your specific Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyBTGKxBtQWLoMsCTMg19bCFXTT_mmUnO3I",
             authDomain: "learnixa-cd8d1.firebaseapp.com",
@@ -236,19 +234,16 @@
             measurementId: "G-NY1X0M9N71"
         };
 
-        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const appId = "learnixa-cd8d1"; // Used for paths
+        const appId = "learnixa-cd8d1";
 
         let confirmationResult = null;
         let isLoginMode = true;
 
-        // Initialize Lucide Icons
         lucide.createIcons();
 
-        // --- DOM Elements ---
         const authView = document.getElementById('auth-view');
         const dashboardView = document.getElementById('dashboard-view');
         const phoneEntrySection = document.getElementById('phone-entry-section');
@@ -256,7 +251,6 @@
         const msgBox = document.getElementById('msg-box');
         const userNameSpan = document.getElementById('user-name');
 
-        // --- UI Helper: Show Message ---
         function showMessage(text, type = 'error') {
             msgBox.textContent = text;
             msgBox.classList.remove('hidden-view', 'bg-red-500/10', 'border-red-500/20', 'text-red-400', 'bg-green-500/10', 'border-green-500/20', 'text-green-400');
@@ -268,7 +262,10 @@
             }
         }
 
-        // --- Auth State Listener ---
+        function clearMessage() {
+            msgBox.classList.add('hidden-view');
+        }
+
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 authView.classList.add('hidden-view');
@@ -281,7 +278,6 @@
             }
         });
 
-        // --- Firestore Persistence (Rule 1) ---
         async function saveUserToDB(user) {
             try {
                 const userRef = doc(db, 'artifacts', appId, 'public', 'data', 'users', user.uid);
@@ -297,26 +293,37 @@
             }
         }
 
-        // --- Social Logins ---
+        // --- Social Logins (CORRECTED ERROR HANDLING) ---
         document.getElementById('google-btn').addEventListener('click', async () => {
+            clearMessage();
             const provider = new GoogleAuthProvider();
             try {
                 await signInWithPopup(auth, provider);
             } catch (err) {
-                showMessage(err.message);
+                // Handling the specific 'popup-closed-by-user' error
+                if (err.code === 'auth/popup-closed-by-user') {
+                    showMessage("Sign-in was cancelled. Please keep the window open to finish logging in.");
+                } else {
+                    showMessage(err.message);
+                }
             }
         });
 
         document.getElementById('github-btn').addEventListener('click', async () => {
+            clearMessage();
             const provider = new GithubAuthProvider();
             try {
                 await signInWithPopup(auth, provider);
             } catch (err) {
-                showMessage(err.message);
+                // Handling the specific 'popup-closed-by-user' error
+                if (err.code === 'auth/popup-closed-by-user') {
+                    showMessage("Sign-in was cancelled. Please keep the window open to finish logging in.");
+                } else {
+                    showMessage(err.message);
+                }
             }
         });
 
-        // --- Phone Auth Logic ---
         function initRecaptcha() {
             if (!window.recaptchaVerifier) {
                 window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
@@ -327,6 +334,7 @@
 
         document.getElementById('phone-form').addEventListener('submit', async (e) => {
             e.preventDefault();
+            clearMessage();
             const phone = document.getElementById('phone-input').value;
             if (!phone) return showMessage("Please enter a phone number.");
 
@@ -346,6 +354,7 @@
 
         document.getElementById('otp-form').addEventListener('submit', async (e) => {
             e.preventDefault();
+            clearMessage();
             const otp = document.getElementById('otp-input').value;
             if (!otp) return showMessage("Enter the 6-digit code.");
 
@@ -359,11 +368,11 @@
         window.resetAuthFlow = () => {
             otpVerifySection.classList.add('hidden-view');
             phoneEntrySection.classList.remove('hidden-view');
-            msgBox.classList.add('hidden-view');
+            clearMessage();
         };
 
-        // --- UI Toggles ---
         window.toggleAuthMode = () => {
+            clearMessage();
             isLoginMode = !isLoginMode;
             document.getElementById('auth-title').textContent = isLoginMode ? 'Welcome Back' : 'Create Account';
             document.getElementById('auth-subtitle').textContent = isLoginMode ? 'Please enter your phone number to continue.' : 'Join Learnixa and start learning today.';
