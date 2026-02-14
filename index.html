@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learnixa | Premium Authentication</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+        
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #020617;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .animate-gradient {
+            background-size: 200% 200%;
+            animation: gradient 15s ease infinite;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .hidden-view { display: none !important; }
+        
+        #recaptcha-container { margin-bottom: 10px; }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <!-- Background Elements -->
+    <div class="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
+        <div class="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-indigo-600/20 blur-[120px] rounded-full"></div>
+        <div class="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-purple-600/20 blur-[120px] rounded-full"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[radial-gradient(circle_at_center,rgba(99,102,241,0.05)_0%,transparent_70%)]"></div>
+    </div>
+
+    <!-- AUTH VIEW (Login/Signup) -->
+    <div id="auth-view" class="min-h-screen flex items-center justify-center p-6">
+        <div class="w-full max-w-6xl grid lg:grid-cols-2 gap-12 items-center">
+            
+            <!-- Left: Branding -->
+            <div class="hidden lg:flex flex-col space-y-8 animate-in fade-in slide-in-from-left-8 duration-700">
+                <div class="flex items-center gap-3">
+                    <div class="bg-indigo-600 p-3 rounded-2xl shadow-lg shadow-indigo-500/30">
+                        <i data-lucide="graduation-cap" class="w-8 h-8"></i>
+                    </div>
+                    <h1 class="text-3xl font-bold tracking-tight">Learnixa</h1>
+                </div>
+                
+                <div class="space-y-4">
+                    <h2 class="text-6xl font-black leading-tight bg-gradient-to-br from-white via-white to-slate-500 bg-clip-text text-transparent">
+                        Elevate your <br /> skills to the <br /> <span class="text-indigo-500">Next Level.</span>
+                    </h2>
+                    <p class="text-slate-400 text-xl max-w-md">
+                        Join the world's most advanced learning platform. Secure, fast, and built for your future.
+                    </p>
+                </div>
+
+                <div class="flex items-center gap-4 text-slate-500 font-medium">
+                    <div class="flex -space-x-2">
+                        <div class="w-10 h-10 rounded-full border-2 border-slate-950 bg-slate-800 flex items-center justify-center text-xs">JD</div>
+                        <div class="w-10 h-10 rounded-full border-2 border-slate-950 bg-slate-700 flex items-center justify-center text-xs">AS</div>
+                        <div class="w-10 h-10 rounded-full border-2 border-slate-950 bg-slate-600 flex items-center justify-center text-xs">RK</div>
+                    </div>
+                    <span>Join 12,000+ students today</span>
+                </div>
+            </div>
+
+            <!-- Right: Auth Card -->
+            <div class="glass rounded-[2.5rem] p-8 md:p-12 shadow-2xl relative group overflow-hidden">
+                <div id="recaptcha-container"></div>
+                
+                <!-- Status/Error Box -->
+                <div id="msg-box" class="hidden-view mb-6 p-4 rounded-xl flex items-center gap-3 text-sm border"></div>
+
+                <div id="phone-entry-section">
+                    <div class="mb-10">
+                        <h3 id="auth-title" class="text-3xl font-bold mb-2">Welcome Back</h3>
+                        <p id="auth-subtitle" class="text-slate-400">Please enter your phone number to continue.</p>
+                    </div>
+
+                    <form id="phone-form" class="space-y-4">
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-500">
+                                <i data-lucide="phone" class="w-5 h-5"></i>
+                            </div>
+                            <input type="tel" id="phone-input" placeholder="+1 234 567 8900" 
+                                class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all outline-none">
+                        </div>
+                        <button type="submit" id="btn-send-otp" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-4 rounded-2xl transition-all flex items-center justify-center gap-2 group">
+                            <span>Send Code</span>
+                            <i data-lucide="arrow-right" class="w-5 h-5 group-hover:translate-x-1 transition-transform"></i>
+                        </button>
+                    </form>
+                </div>
+
+                <div id="otp-verify-section" class="hidden-view">
+                    <div class="mb-10">
+                        <h3 class="text-3xl font-bold mb-2">Verify OTP</h3>
+                        <p class="text-slate-400">We sent a 6-digit code to your phone.</p>
+                    </div>
+                    <form id="otp-form" class="space-y-4">
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-500">
+                                <i data-lucide="shield-check" class="w-5 h-5"></i>
+                            </div>
+                            <input type="text" id="otp-input" placeholder="000000" maxlength="6"
+                                class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all outline-none text-center tracking-[0.5em] text-xl font-bold">
+                        </div>
+                        <button type="submit" id="btn-verify-otp" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-4 rounded-2xl transition-all">
+                            Verify & Continue
+                        </button>
+                        <button type="button" onclick="resetAuthFlow()" class="w-full text-slate-400 text-sm hover:text-white transition-colors">
+                            Change Phone Number
+                        </button>
+                    </form>
+                </div>
+
+                <div class="relative py-8">
+                    <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-white/10"></div></div>
+                    <div class="relative flex justify-center text-xs uppercase"><span class="bg-[#0f172a] px-4 text-slate-500">Or continue with</span></div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <button id="google-btn" class="flex items-center justify-center gap-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl py-3.5 transition-all">
+                        <svg viewBox="0 0 24 24" class="w-5 h-5"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+                        <span class="text-sm font-semibold">Google</span>
+                    </button>
+                    <button id="github-btn" class="flex items-center justify-center gap-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl py-3.5 transition-all">
+                        <i data-lucide="github" class="w-5 h-5"></i>
+                        <span class="text-sm font-semibold">GitHub</span>
+                    </button>
+                </div>
+
+                <div class="mt-8 text-center">
+                    <p class="text-slate-500 text-sm">
+                        New to Learnixa? <button onclick="toggleAuthMode()" id="toggle-mode-btn" class="text-indigo-400 font-bold hover:text-indigo-300 transition-colors">Create an account</button>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DASHBOARD VIEW (Shown after login) -->
+    <div id="dashboard-view" class="hidden-view min-h-screen">
+        <nav class="p-6 flex justify-between items-center max-w-7xl mx-auto">
+            <div class="flex items-center gap-2">
+                <div class="bg-indigo-600 p-2 rounded-lg"><i data-lucide="graduation-cap" class="w-6 h-6"></i></div>
+                <span class="text-2xl font-bold tracking-tight">Learnixa</span>
+            </div>
+            <button id="logout-btn" class="flex items-center gap-2 px-5 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full transition-all text-sm font-medium">
+                <i data-lucide="log-out" class="w-4 h-4"></i> Sign Out
+            </button>
+        </nav>
+
+        <main class="max-w-5xl mx-auto mt-16 px-6 pb-20">
+            <div class="glass rounded-[3rem] p-10 md:p-16 text-center relative overflow-hidden">
+                <!-- Abstract decoration -->
+                <div class="absolute -top-20 -right-20 w-64 h-64 bg-indigo-500/10 blur-[100px] rounded-full"></div>
+                
+                <div class="inline-flex items-center justify-center p-5 bg-green-500/10 rounded-full mb-8 text-green-400 border border-green-500/20">
+                    <i data-lucide="check-circle-2" class="w-12 h-12"></i>
+                </div>
+                
+                <h1 class="text-4xl md:text-6xl font-extrabold mb-6 leading-tight">
+                    Welcome back, <br/><span id="user-name" class="bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">Explorer</span>!
+                </h1>
+                
+                <p class="text-slate-400 text-xl max-w-2xl mx-auto mb-12">
+                    You've successfully connected your account. Ready to continue your masterclass in Advanced Web Architectures?
+                </p>
+
+                <div class="grid md:grid-cols-3 gap-6 text-left">
+                    <div class="glass p-6 rounded-3xl hover:bg-white/10 transition-all cursor-pointer group">
+                        <i data-lucide="play-circle" class="w-8 h-8 text-indigo-400 mb-4"></i>
+                        <h4 class="font-bold text-lg mb-1">Resume Lesson</h4>
+                        <p class="text-slate-500 text-sm">Module 4: Distributed Systems</p>
+                    </div>
+                    <div class="glass p-6 rounded-3xl hover:bg-white/10 transition-all cursor-pointer">
+                        <i data-lucide="book-open" class="w-8 h-8 text-purple-400 mb-4"></i>
+                        <h4 class="font-bold text-lg mb-1">Study Material</h4>
+                        <p class="text-slate-500 text-sm">Download PDFs and Resources</p>
+                    </div>
+                    <div class="glass p-6 rounded-3xl hover:bg-white/10 transition-all cursor-pointer">
+                        <i data-lucide="users" class="w-8 h-8 text-pink-400 mb-4"></i>
+                        <h4 class="font-bold text-lg mb-1">Community</h4>
+                        <p class="text-slate-500 text-sm">Join the student discord</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Firebase Scripts -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { 
+            getAuth, 
+            signInWithPopup, 
+            GoogleAuthProvider, 
+            GithubAuthProvider, 
+            RecaptchaVerifier, 
+            signInWithPhoneNumber, 
+            onAuthStateChanged, 
+            signOut 
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { 
+            getFirestore, 
+            doc, 
+            setDoc 
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Your specific Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBTGKxBtQWLoMsCTMg19bCFXTT_mmUnO3I",
+            authDomain: "learnixa-cd8d1.firebaseapp.com",
+            projectId: "learnixa-cd8d1",
+            storageBucket: "learnixa-cd8d1.firebasestorage.app",
+            messagingSenderId: "474328890723",
+            appId: "1:474328890723:web:193f1a6f2c9a31df8c2756",
+            measurementId: "G-NY1X0M9N71"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = "learnixa-cd8d1"; // Used for paths
+
+        let confirmationResult = null;
+        let isLoginMode = true;
+
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // --- DOM Elements ---
+        const authView = document.getElementById('auth-view');
+        const dashboardView = document.getElementById('dashboard-view');
+        const phoneEntrySection = document.getElementById('phone-entry-section');
+        const otpVerifySection = document.getElementById('otp-verify-section');
+        const msgBox = document.getElementById('msg-box');
+        const userNameSpan = document.getElementById('user-name');
+
+        // --- UI Helper: Show Message ---
+        function showMessage(text, type = 'error') {
+            msgBox.textContent = text;
+            msgBox.classList.remove('hidden-view', 'bg-red-500/10', 'border-red-500/20', 'text-red-400', 'bg-green-500/10', 'border-green-500/20', 'text-green-400');
+            
+            if (type === 'error') {
+                msgBox.classList.add('bg-red-500/10', 'border-red-500/20', 'text-red-400');
+            } else {
+                msgBox.classList.add('bg-green-500/10', 'border-green-500/20', 'text-green-400');
+            }
+        }
+
+        // --- Auth State Listener ---
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                authView.classList.add('hidden-view');
+                dashboardView.classList.remove('hidden-view');
+                userNameSpan.textContent = user.displayName || user.phoneNumber || 'Student';
+                saveUserToDB(user);
+            } else {
+                authView.classList.remove('hidden-view');
+                dashboardView.classList.add('hidden-view');
+            }
+        });
+
+        // --- Firestore Persistence (Rule 1) ---
+        async function saveUserToDB(user) {
+            try {
+                const userRef = doc(db, 'artifacts', appId, 'public', 'data', 'users', user.uid);
+                await setDoc(userRef, {
+                    uid: user.uid,
+                    displayName: user.displayName || 'Learner',
+                    email: user.email || '',
+                    lastLogin: new Date().toISOString(),
+                    authProvider: user.providerData[0]?.providerId || 'phone'
+                }, { merge: true });
+            } catch (e) {
+                console.error("DB error:", e);
+            }
+        }
+
+        // --- Social Logins ---
+        document.getElementById('google-btn').addEventListener('click', async () => {
+            const provider = new GoogleAuthProvider();
+            try {
+                await signInWithPopup(auth, provider);
+            } catch (err) {
+                showMessage(err.message);
+            }
+        });
+
+        document.getElementById('github-btn').addEventListener('click', async () => {
+            const provider = new GithubAuthProvider();
+            try {
+                await signInWithPopup(auth, provider);
+            } catch (err) {
+                showMessage(err.message);
+            }
+        });
+
+        // --- Phone Auth Logic ---
+        function initRecaptcha() {
+            if (!window.recaptchaVerifier) {
+                window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+                    'size': 'invisible'
+                });
+            }
+        }
+
+        document.getElementById('phone-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const phone = document.getElementById('phone-input').value;
+            if (!phone) return showMessage("Please enter a phone number.");
+
+            initRecaptcha();
+            const appVerifier = window.recaptchaVerifier;
+
+            try {
+                confirmationResult = await signInWithPhoneNumber(auth, phone, appVerifier);
+                phoneEntrySection.classList.add('hidden-view');
+                otpVerifySection.classList.remove('hidden-view');
+                showMessage("Code sent successfully!", "success");
+            } catch (err) {
+                showMessage(err.message);
+                if (window.recaptchaVerifier) window.recaptchaVerifier.clear();
+            }
+        });
+
+        document.getElementById('otp-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const otp = document.getElementById('otp-input').value;
+            if (!otp) return showMessage("Enter the 6-digit code.");
+
+            try {
+                await confirmationResult.confirm(otp);
+            } catch (err) {
+                showMessage("Invalid code. Please try again.");
+            }
+        });
+
+        window.resetAuthFlow = () => {
+            otpVerifySection.classList.add('hidden-view');
+            phoneEntrySection.classList.remove('hidden-view');
+            msgBox.classList.add('hidden-view');
+        };
+
+        // --- UI Toggles ---
+        window.toggleAuthMode = () => {
+            isLoginMode = !isLoginMode;
+            document.getElementById('auth-title').textContent = isLoginMode ? 'Welcome Back' : 'Create Account';
+            document.getElementById('auth-subtitle').textContent = isLoginMode ? 'Please enter your phone number to continue.' : 'Join Learnixa and start learning today.';
+            document.getElementById('toggle-mode-btn').textContent = isLoginMode ? 'Create an account' : 'Log in here';
+        };
+
+        document.getElementById('logout-btn').addEventListener('click', () => signOut(auth));
+    </script>
+</body>
+</html>
