@@ -37,93 +37,66 @@
             -webkit-backdrop-filter: blur(40px);
             border: 1px solid rgba(255, 255, 255, 0.08);
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            transition: transform 0.3s ease;
+            transition: all 0.4s ease;
         }
 
-        /* Moving Code Stream */
-        @keyframes codeStream {
-            0% { transform: translateY(-100%); opacity: 0; }
-            10% { opacity: 0.1; }
-            90% { opacity: 0.1; }
-            100% { transform: translateY(100vh); opacity: 0; }
-        }
-
-        .code-particle {
-            position: absolute;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.75rem;
-            color: #3b82f6;
-            white-space: nowrap;
-            pointer-events: none;
-            user-select: none;
-            z-index: -1;
-        }
-
-        /* Huge Branding Text with Letter Jump */
-        .hero-title {
-            font-size: clamp(4rem, 12vw, 10rem);
-            line-height: 0.8;
-            letter-spacing: -0.05em;
-            font-weight: 900;
-            text-transform: uppercase;
+        /* Ball Reveal Animation */
+        .logo-ball {
+            width: 80px;
+            height: 80px;
+            background: #3b82f6;
+            border-radius: 50%;
             display: flex;
-            cursor: default;
+            align-items: center;
+            justify-content: center;
+            animation: ballPop 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.5);
         }
 
-        .hero-letter {
-            display: inline-block;
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            background: linear-gradient(to bottom, #fff 40%, rgba(255,255,255,0.1));
+        @keyframes ballPop {
+            0% { transform: scale(0) rotate(-180deg); opacity: 0; }
+            70% { transform: scale(1.1) rotate(10deg); }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+
+        .hero-title {
+            font-size: 2.5rem; /* Lowered font size as requested */
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            opacity: 0;
+            transform: translateX(-20px);
+            animation: textReveal 0.8s ease 0.8s forwards;
+            background: linear-gradient(to right, #fff, #3b82f6);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
-        /* Jumps when cursor is near or over the title */
-        .hero-title:hover .hero-letter {
-            animation: jump 0.8s ease-in-out infinite alternate;
+        @keyframes textReveal {
+            to { opacity: 1; transform: translateX(0); }
         }
 
-        /* stagger the jump animation */
-        .hero-title .hero-letter:nth-child(1) { animation-delay: 0.1s; }
-        .hero-title .hero-letter:nth-child(2) { animation-delay: 0.2s; }
-        .hero-title .hero-letter:nth-child(3) { animation-delay: 0.3s; }
-        .hero-title .hero-letter:nth-child(4) { animation-delay: 0.4s; }
-        .hero-title .hero-letter:nth-child(5) { animation-delay: 0.5s; }
-        .hero-title .hero-letter:nth-child(6) { animation-delay: 0.6s; }
-        .hero-title .hero-letter:nth-child(7) { animation-delay: 0.7s; }
-        .hero-title .hero-letter:nth-child(8) { animation-delay: 0.8s; }
-
-        @keyframes jump {
-            0% { transform: translateY(0); }
-            100% { transform: translateY(-25px); }
-        }
-
-        /* Stabilization when login is active */
-        .login-active .hero-letter {
-            animation: none !important;
-            transform: translateY(0) !important;
-        }
-
-        /* Text Shifter */
-        .text-slide-wrapper {
-            height: 1.2em;
+        /* Learning Card Animations */
+        .learning-card {
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            position: relative;
             overflow: hidden;
-            display: inline-block;
-            vertical-align: bottom;
+        }
+        .learning-card:hover {
+            transform: translateY(-10px);
+            border-color: rgba(59, 130, 246, 0.5);
+            background: rgba(255, 255, 255, 0.06);
         }
 
-        .text-slide {
-            display: block;
-            animation: slideUp 8s infinite ease-in-out;
+        .learning-card::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            transition: 0.5s;
         }
-
-        @keyframes slideUp {
-            0%, 20% { transform: translateY(0); }
-            25%, 45% { transform: translateY(-25%); }
-            50%, 70% { transform: translateY(-50%); }
-            75%, 95% { transform: translateY(-75%); }
-            100% { transform: translateY(0); }
-        }
+        .learning-card:hover::after { left: 100%; }
 
         .hidden-view { display: none !important; }
 
@@ -146,91 +119,51 @@
 </head>
 <body>
 
-    <!-- Professional Background Animation -->
-    <div id="code-bg" class="fixed inset-0 -z-10 overflow-hidden pointer-events-none"></div>
-
     <!-- AUTH VIEW -->
     <div id="auth-view" class="min-h-screen flex items-center justify-center p-6 lg:p-12">
         <div class="w-full max-w-7xl grid lg:grid-cols-2 gap-12 items-center">
             
-            <!-- Left Side: Massive Branding -->
-            <div class="flex flex-col space-y-12 animate-in fade-in slide-in-from-left-12 duration-1000">
-                <div>
-                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/5 text-[10px] uppercase tracking-[0.3em] font-bold mb-6">
-                        <span class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
-                        Status: Operational
+            <!-- Left Side: Ball Pop & Branding -->
+            <div class="flex flex-col items-center lg:items-start space-y-10">
+                <div class="flex items-center gap-6">
+                    <div class="logo-ball">
+                        <i data-lucide="graduation-cap" class="text-white w-10 h-10"></i>
                     </div>
-                    <h1 class="hero-title italic" id="main-title">
-                        <span class="hero-letter">L</span>
-                        <span class="hero-letter">E</span>
-                        <span class="hero-letter">A</span>
-                        <span class="hero-letter">R</span>
-                        <span class="hero-letter">N</span>
-                        <span class="hero-letter">I</span>
-                        <span class="hero-letter">X</span>
-                        <span class="hero-letter">A</span>
-                    </h1>
+                    <h1 class="hero-title italic">LEARNIXA</h1>
                 </div>
                 
-                <div class="space-y-6">
-                    <h2 class="text-5xl font-extrabold tracking-tight">
-                        <span class="text-slide-wrapper">
-                            <span class="text-slide">
-                                <span class="block">Learn Joyfully.</span>
-                                <span class="block">Code Purely.</span>
-                                <span class="block">Build Boldly.</span>
-                                <span class="block">Design Deeply.</span>
-                            </span>
-                        </span>
+                <div class="space-y-6 text-center lg:text-left">
+                    <h2 class="text-4xl font-extrabold tracking-tight">
+                        Experience Learning <br/> <span class="text-blue-400">Purely.</span>
                     </h2>
-                    <p class="text-white/40 text-lg max-w-sm font-medium leading-relaxed">
-                        Step into the next generation of architectural learning. Zero friction. Total mastery.
+                    <p class="text-white/40 text-lg max-w-sm font-medium leading-relaxed mx-auto lg:mx-0">
+                        Zero friction. Total mastery. Access your student entity to begin.
                     </p>
                 </div>
             </div>
 
             <!-- Right Side Card -->
-            <div class="glass-premium rounded-[3rem] p-10 md:p-16 relative overflow-hidden" id="login-card">
+            <div class="glass-premium rounded-[3rem] p-10 md:p-16 relative overflow-hidden">
                 <div id="msg-box" class="hidden-view mb-8 p-4 rounded-2xl text-xs uppercase tracking-widest border border-white/10 bg-white/5 font-black text-center"></div>
 
                 <div id="auth-section">
                     <div class="mb-10 text-center lg:text-left">
                         <h3 id="auth-title" class="text-4xl font-bold mb-3 tracking-tighter">Initialize</h3>
-                        <p id="auth-subtitle" class="text-white/40 font-bold uppercase text-[10px] tracking-[0.2em]">Secure Authentication Protocol Required</p>
+                        <p id="auth-subtitle" class="text-white/40 font-bold uppercase text-[10px] tracking-[0.2em]">Secure Protocol Required</p>
                     </div>
 
                     <form id="auth-form" class="space-y-6">
-                        <div class="space-y-2">
-                            <input type="email" id="email-input" placeholder="ACCESS EMAIL" required
-                                class="w-full bg-white/5 border border-white/10 rounded-2xl py-5 px-6 text-white placeholder:text-white/20 focus:outline-none focus:border-blue-500/50 transition-all uppercase tracking-widest text-xs font-bold">
-                        </div>
+                        <input type="email" id="email-input" placeholder="ACCESS EMAIL" required
+                            class="w-full bg-white/5 border border-white/10 rounded-2xl py-5 px-6 text-white placeholder:text-white/20 focus:outline-none focus:border-blue-500/50 transition-all uppercase tracking-widest text-xs font-bold">
                         
-                        <div class="space-y-2">
-                            <input type="password" id="password-input" placeholder="ACCESS KEY" required
-                                class="w-full bg-white/5 border border-white/10 rounded-2xl py-5 px-6 text-white placeholder:text-white/20 focus:outline-none focus:border-blue-500/50 transition-all uppercase tracking-widest text-xs font-bold">
-                        </div>
+                        <input type="password" id="password-input" placeholder="ACCESS KEY" required
+                            class="w-full bg-white/5 border border-white/10 rounded-2xl py-5 px-6 text-white placeholder:text-white/20 focus:outline-none focus:border-blue-500/50 transition-all uppercase tracking-widest text-xs font-bold">
 
                         <button type="submit" class="w-full btn-action font-black py-5 rounded-2xl flex items-center justify-center gap-3 mt-4 group">
                             <span id="btn-text" class="uppercase tracking-widest text-sm">Synchronize Access</span>
                             <i data-lucide="zap" class="w-4 h-4 fill-current"></i>
                         </button>
                     </form>
-                </div>
-
-                <div class="relative py-12">
-                    <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-white/5"></div></div>
-                    <div class="relative flex justify-center text-[9px] uppercase tracking-[0.4em] font-black"><span class="bg-[#0b1021] px-6 text-white/20">External Handshake</span></div>
-                </div>
-
-                <div class="grid grid-cols-2 gap-4">
-                    <button id="google-btn" class="flex items-center justify-center gap-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl py-4 transition-all">
-                        <i data-lucide="globe" class="w-4 h-4 text-white/40"></i>
-                        <span class="text-[10px] font-black uppercase tracking-widest">Google</span>
-                    </button>
-                    <button id="github-btn" class="flex items-center justify-center gap-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-2xl py-4 transition-all">
-                        <i data-lucide="github" class="w-4 h-4 text-white/40"></i>
-                        <span class="text-[10px] font-black uppercase tracking-widest">GitHub</span>
-                    </button>
                 </div>
 
                 <div class="mt-12 text-center">
@@ -244,47 +177,56 @@
 
     <!-- DASHBOARD VIEW -->
     <div id="dashboard-view" class="hidden-view min-h-screen">
-        <nav class="p-10 flex justify-between items-center max-w-7xl mx-auto">
+        <nav class="p-8 flex justify-between items-center max-w-7xl mx-auto">
             <div class="flex items-center gap-4">
-                <i data-lucide="command" class="w-8 h-8 text-blue-400"></i>
-                <span class="text-2xl font-black tracking-tighter uppercase italic">Learnixa</span>
+                <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
+                    <i data-lucide="command" class="w-6 h-6 text-white"></i>
+                </div>
+                <span class="text-xl font-black tracking-tighter uppercase italic">Learnixa</span>
             </div>
             <button id="logout-btn" class="px-8 py-3 bg-white/5 border border-white/10 rounded-full hover:bg-white hover:text-black transition-all text-[10px] font-black uppercase tracking-widest">
                 Disconnect
             </button>
         </nav>
 
-        <main class="max-w-7xl mx-auto mt-12 px-10 pb-24">
-            <div class="glass-premium rounded-[4rem] p-16 md:p-24 text-center">
-                <div class="inline-block p-6 bg-blue-500 rounded-3xl mb-12 shadow-xl shadow-blue-500/20">
-                    <i data-lucide="user-check" class="w-12 h-12 text-white"></i>
-                </div>
-                
-                <h1 class="text-6xl md:text-9xl font-black mb-10 tracking-tighter uppercase">
-                    <span id="welcome-prefix" class="block text-blue-400/60 text-sm uppercase tracking-[1em] mb-6 font-black">Authorized Entry</span>
+        <main class="max-w-6xl mx-auto mt-12 px-6 pb-24">
+            <div class="glass-premium rounded-[4rem] p-12 md:p-20 text-center">
+                <h1 class="text-5xl md:text-7xl font-black mb-6 tracking-tighter uppercase">
+                    <span id="welcome-prefix" class="block text-blue-400/60 text-xs uppercase tracking-[0.8em] mb-4 font-black">Authorized Entry</span>
                     <span id="user-name" class="italic">Explorer</span>
                 </h1>
                 
-                <p class="text-white/40 text-xl max-w-3xl mx-auto mb-20 font-medium leading-relaxed">
-                    You have successfully established a secure link to the Learnixa Core. 
-                    All systems are green. Proceed to your next evolution.
+                <p class="text-white/40 text-lg max-w-2xl mx-auto mb-16 font-medium">
+                    Select your learning trajectory to continue your synchronization with the core.
                 </p>
 
-                <div class="grid md:grid-cols-3 gap-8 text-left">
-                    <div class="glass-premium p-10 rounded-[2.5rem] hover:bg-blue-500/10 transition-all cursor-pointer group">
-                        <i data-lucide="activity" class="w-8 h-8 mb-8 text-blue-400"></i>
-                        <h4 class="font-black text-xs uppercase tracking-widest mb-2">Ongoing Flux</h4>
-                        <p class="text-white font-bold text-lg">04: Neural Systems</p>
+                <div class="grid md:grid-cols-2 gap-8 text-left">
+                    <!-- Path 1: Data Analyst -->
+                    <div class="learning-card glass-premium p-10 rounded-[3rem] cursor-pointer group">
+                        <div class="flex justify-between items-start mb-8">
+                            <div class="p-4 bg-blue-500/20 rounded-2xl">
+                                <i data-lucide="bar-chart-3" class="w-8 h-8 text-blue-400"></i>
+                            </div>
+                            <span class="text-[10px] bg-blue-500/10 text-blue-400 px-3 py-1 rounded-full font-bold">75% COMPLETE</span>
+                        </div>
+                        <h4 class="font-black text-xs uppercase tracking-[0.2em] text-blue-400/60 mb-2">Resume Path</h4>
+                        <p class="text-2xl font-black text-white mb-4">Data Analyst Pro</p>
+                        <p class="text-white/40 text-sm mb-8 leading-relaxed">Master SQL, Python and Tableau visualization strategies.</p>
+                        <button class="w-full py-4 bg-blue-500 hover:bg-blue-400 text-white font-black rounded-2xl transition-all uppercase tracking-widest text-xs">Continue Mission</button>
                     </div>
-                    <div class="glass-premium p-10 rounded-[2.5rem] hover:bg-blue-500/10 transition-all cursor-pointer">
-                        <i data-lucide="archive" class="w-8 h-8 mb-8 text-blue-400"></i>
-                        <h4 class="font-black text-xs uppercase tracking-widest mb-2">Vault</h4>
-                        <p class="text-white font-bold text-lg">System Blueprints</p>
-                    </div>
-                    <div class="glass-premium p-10 rounded-[2.5rem] hover:bg-blue-500/10 transition-all cursor-pointer">
-                        <i data-lucide="terminal" class="w-8 h-8 mb-8 text-blue-400"></i>
-                        <h4 class="font-black text-xs uppercase tracking-widest mb-2">Compiler</h4>
-                        <p class="text-white font-bold text-lg">Live Playground</p>
+
+                    <!-- Path 2: Data Scientist -->
+                    <div class="learning-card glass-premium p-10 rounded-[3rem] cursor-pointer group">
+                        <div class="flex justify-between items-start mb-8">
+                            <div class="p-4 bg-indigo-500/20 rounded-2xl">
+                                <i data-lucide="brain-circuit" class="w-8 h-8 text-indigo-400"></i>
+                            </div>
+                            <span class="text-[10px] bg-indigo-500/10 text-indigo-400 px-3 py-1 rounded-full font-bold">NEW TRACK</span>
+                        </div>
+                        <h4 class="font-black text-xs uppercase tracking-[0.2em] text-indigo-400/60 mb-2">Initialize Path</h4>
+                        <p class="text-2xl font-black text-white mb-4">Data Scientist Core</p>
+                        <p class="text-white/40 text-sm mb-8 leading-relaxed">Deep dive into Machine Learning, Neural Networks and Big Data.</p>
+                        <button class="w-full py-4 bg-white/10 hover:bg-white/20 text-white font-black rounded-2xl transition-all uppercase tracking-widest text-xs border border-white/10">Start Evolution</button>
                     </div>
                 </div>
             </div>
@@ -320,40 +262,6 @@
 
         lucide.createIcons();
 
-        // --- Background Code Rain ---
-        const codeSnippets = [
-            'const learnixa = true;', 'import { skill } from "brain";', 'async function evolve()',
-            '<html>', 'npm install growth', 'while(curious) { study(); }', 
-            'await db.sync();', 'git push origin future', 'System.out.println("Joy");',
-            'for(let i in potential)', 'status: 200 SUCCESS', 'class Master extends Student'
-        ];
-
-        function createCodeRain() {
-            const container = document.getElementById('code-bg');
-            setInterval(() => {
-                const el = document.createElement('div');
-                el.className = 'code-particle';
-                el.textContent = codeSnippets[Math.floor(Math.random() * codeSnippets.length)];
-                el.style.left = Math.random() * 100 + 'vw';
-                el.style.animation = `codeStream ${6 + Math.random() * 10}s linear forwards`;
-                container.appendChild(el);
-                setTimeout(() => el.remove(), 15000);
-            }, 600);
-        }
-        createCodeRain();
-
-        // --- Interaction Logic for jumping words ---
-        const title = document.getElementById('main-title');
-        const card = document.getElementById('login-card');
-
-        // When nearing or focusing on login card, stabilize the words
-        card.addEventListener('mouseenter', () => {
-            title.classList.add('login-active');
-        });
-        card.addEventListener('mouseleave', () => {
-            title.classList.remove('login-active');
-        });
-
         const authView = document.getElementById('auth-view');
         const dashboardView = document.getElementById('dashboard-view');
         const msgBox = document.getElementById('msg-box');
@@ -375,7 +283,7 @@
                 authView.classList.add('hidden-view');
                 dashboardView.classList.remove('hidden-view');
                 userNameSpan.textContent = user.displayName || user.email.split('@')[0];
-                welcomePrefix.textContent = isNewSignup ? "Welcome to the evolution" : "Authorized Entry Established";
+                welcomePrefix.textContent = isNewSignup ? "Welcome to the Course" : "Authorized Entry Established";
                 saveUserToDB(user);
             } else {
                 authView.classList.remove('hidden-view');
@@ -407,28 +315,15 @@
                     isNewSignup = true;
                     await createUserWithEmailAndPassword(auth, email, password);
                 }
-            } catch (err) { handleAuthError(err); }
-        });
-
-        function handleAuthError(err) {
-            if (err.code === 'auth/popup-closed-by-user') showMessage("Protocol Interrupted: Popup Closed.");
-            else showMessage(err.message.split('/')[1]?.replace('-', ' ').toUpperCase() || err.message);
-        }
-
-        document.getElementById('google-btn').addEventListener('click', async () => {
-            isNewSignup = false;
-            try { await signInWithPopup(auth, new GoogleAuthProvider()); } catch (err) { handleAuthError(err); }
-        });
-
-        document.getElementById('github-btn').addEventListener('click', async () => {
-            isNewSignup = false;
-            try { await signInWithPopup(auth, new GithubAuthProvider()); } catch (err) { handleAuthError(err); }
+            } catch (err) { 
+                if (err.code === 'auth/popup-closed-by-user') showMessage("Protocol Interrupted: Popup Closed.");
+                else showMessage(err.message.split('/')[1]?.replace('-', ' ').toUpperCase() || err.message);
+            }
         });
 
         window.toggleAuthMode = () => {
             isLoginMode = !isLoginMode;
             document.getElementById('auth-title').textContent = isLoginMode ? 'Initialize' : 'Registration';
-            document.getElementById('auth-subtitle').textContent = isLoginMode ? 'Secure Authentication Protocol Required' : 'Initialize New Student Entity';
             document.getElementById('btn-text').textContent = isLoginMode ? 'Synchronize Access' : 'Register Interface';
             document.getElementById('toggle-mode-btn').innerHTML = isLoginMode ? 'New Entity? <span class="text-white ml-2 border-b border-white/20">Register Interface</span>' : 'Linked Entity? <span class="text-white ml-2 border-b border-white/20">Login Protocol</span>';
         };
